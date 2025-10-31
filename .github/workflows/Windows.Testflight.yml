@@ -39,12 +39,6 @@ jobs:
 
       - name: 👷 Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
-
-      - name: ⏬ Install deps
-        run: |
-          # nuget install X.Player\packages.config
-          nuget restore X.Player\X.Player.vcxproj -OutputDirectory packages
-        shell: pwsh
         
       - name: ⏰ Cache
         uses: actions/cache@v4
@@ -53,6 +47,12 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
+            
+      - name: ⏬ Install deps
+        run: |
+          # nuget install X.Player\packages.config
+          nuget restore X.Player\X.Player.vcxproj -OutputDirectory packages
+        shell: pwsh
 
       - name: ✅ Decode and Import Certificate
         run: |
