@@ -108,31 +108,60 @@ jobs:
           echo version_name="v1.0 $(git rev-parse --short HEAD)" >> $GITHUB_ENV
         shell: bash
 
-      - name: ⏫ Upload to Onedrive
+      # - name: ⏫ Upload to Onedrive
+      #   run: |
+      #     version_code="$(git rev-list --count HEAD)"
+      #     buildtime=$(date '+%Y%m%d.%H%M')
+      #     mkdir -p Desktop/Publish
+      #     cp "Desktop/AppPackages/ZipPackages/iPlayX_1.0.${version_code}.0_ARM64_Sideload.zip" Desktop/Publish/
+      #     cp "Desktop/AppPackages/ZipPackages/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" Desktop/Publish/
+      #     cp "Desktop/AppPackages/iPlayX_1.0.${version_code}.0.msixbundle" Desktop/Publish/
+      #     python -m pip install requests
+      #     python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlay_1.0.${version_code}.0.msixbundle" \
+      #       --file "$PWD/Desktop/Publish/iPlayX_1.0.${version_code}.0.msixbundle" \
+      #       --token "${{ secrets.CLIENT_ID }}"
+      #     python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlayX_1.0.${version_code}.0_ARM64_Sideload.zip" \
+      #       --file "$PWD/Desktop/Publish/iPlayX_1.0.${version_code}.0_ARM64_Sideload.zip" \
+      #       --token "${{ secrets.CLIENT_ID }}"
+      #     python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" \
+      #       --file "$PWD/Desktop/Publish/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" \
+      #       --token "${{ secrets.CLIENT_ID }}"
+
+      #     echo "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" > "$PWD/latest.zip.url"
+      #     python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/latest.zip.url" \
+      #       --file "$PWD/latest.zip.url" \
+      #       --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
+      #     ls Desktop/Publish
+      #   shell: bash
+      - name: 🔢 Update Build Number
+        id: update_build_number
         run: |
           version_code="$(git rev-list --count HEAD)"
           buildtime=$(date '+%Y%m%d.%H%M')
-          mkdir -p Desktop/Publish
-          cp "Desktop/AppPackages/ZipPackages/iPlayX_1.0.${version_code}.0_ARM64_Sideload.zip" Desktop/Publish/
-          cp "Desktop/AppPackages/ZipPackages/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" Desktop/Publish/
-          cp "Desktop/AppPackages/iPlayX_1.0.${version_code}.0.msixbundle" Desktop/Publish/
-          python -m pip install requests
-          python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlay_1.0.${version_code}.0.msixbundle" \
-            --file "$PWD/Desktop/Publish/iPlayX_1.0.${version_code}.0.msixbundle" \
-            --token "${{ secrets.CLIENT_ID }}"
-          python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlayX_1.0.${version_code}.0_ARM64_Sideload.zip" \
-            --file "$PWD/Desktop/Publish/iPlayX_1.0.${version_code}.0_ARM64_Sideload.zip" \
-            --token "${{ secrets.CLIENT_ID }}"
-          python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" \
-            --file "$PWD/Desktop/Publish/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" \
-            --token "${{ secrets.CLIENT_ID }}"
-
-          echo "https://drive.ourfor.top/od_bot/build/iPlay/Windows/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" > "$PWD/latest.zip.url"
-          python ./scripts/upload.py --url "https://drive.ourfor.top/od_bot/build/iPlay/Windows/latest.zip.url" \
-            --file "$PWD/latest.zip.url" \
-            --token "${{ secrets.ONEDRIVE_CLIENT_ID }}"
-          ls Desktop/Publish
-        shell: bash
+          echo "version_code=$version_code" >> $GITHUB_OUTPUT
+          echo "buildtime=$buildtime" >> $GITHUB_OUTPUT
+          
+      - name: 🏷️ Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: endpne/iPlay-Release-Windows
+          token: ${{ secrets.GH_RELEASE_TOKEN }}
+          name: Windows Build ${{ steps.update_build_number.outputs.version_code }}
+          tag_name: windows-build-${{ steps.update_build_number.outputs.version_code }}
+          make_latest: true
+          body: |
+            Windows TestFlight Build ${{ steps.update_build_number.outputs.version_code }}
+            
+            Build artifacts:
+            - iPlay.msixbundle (TestFlight package)
+            
+            **Installation Options:**
+            1. Use the .msixbundle file for TestFlight distribution
+          files: |
+            Desktop/AppPackages/ZipPackages/iPlayX_1.0.${{ steps.update_build_number.outputs.version_code }}.0_ARM64_Sideload.zip
+            Desktop/AppPackages/ZipPackages/iPlayX_1.0.${{ steps.update_build_number.outputs.version_code }}.0_x64_Sideload.zip
+            Desktop/AppPackages/iPlayX_1.0.${{ steps.update_build_number.outputs.version_code }}.0.msixbundle
+            
       
       - name: ⬆️ Submit to Microsoft Store
         uses: ourfor/windows-store-action@1.0.5
