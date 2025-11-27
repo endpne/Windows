@@ -140,6 +140,7 @@ jobs:
           buildtime=$(date '+%Y%m%d.%H%M')
           echo "version_code=$version_code" >> $GITHUB_OUTPUT
           echo "buildtime=$buildtime" >> $GITHUB_OUTPUT
+        shell: bash
           
       - name: 🏷️ Create GitHub Release
         uses: softprops/action-gh-release@v2
