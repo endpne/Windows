@@ -140,6 +140,10 @@ jobs:
           buildtime=$(date '+%Y%m%d.%H%M')
           echo "version_code=$version_code" >> $GITHUB_OUTPUT
           echo "buildtime=$buildtime" >> $GITHUB_OUTPUT
+          mkdir -p Desktop/Publish
+          cp "Desktop/AppPackages/ZipPackages/iPlayX_1.0.${version_code}.0_ARM64_Sideload.zip" Desktop/Publish/
+          cp "Desktop/AppPackages/ZipPackages/iPlayX_1.0.${version_code}.0_x64_Sideload.zip" Desktop/Publish/
+          cp "Desktop/AppPackages/iPlayX_1.0.${version_code}.0.msixbundle" Desktop/Publish/
         shell: bash
           
       - name: 🏷️ Create GitHub Release
