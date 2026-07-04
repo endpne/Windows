@@ -36,6 +36,7 @@ jobs:
           repository: saltpi/iPlay.Windows
           ref: ${{ github.event.inputs.ref || 'develop' }}
           fetch-depth: 0
+          submodules: recursive
           token: ${{ secrets.REPO_TOKEN }}
 
       - name: 🔢 Prepare version
