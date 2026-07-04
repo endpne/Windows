@@ -36,7 +36,6 @@ jobs:
           repository: saltpi/iPlay.Windows
           ref: ${{ github.event.inputs.ref || 'develop' }}
           fetch-depth: 0
-          submodules: recursive
           token: ${{ secrets.REPO_TOKEN }}
 
       - name: 🔢 Prepare version
@@ -80,6 +79,7 @@ jobs:
           ref: ${{ github.event.inputs.ref || 'develop' }}
           fetch-depth: 0
           token: ${{ secrets.REPO_TOKEN }}
+          submodules: recursive
 
       - name: 👷 Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
